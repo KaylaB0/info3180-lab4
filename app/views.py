@@ -7,6 +7,8 @@ from app.models import UserProfile
 from app.forms import LoginForm
 from werkzeug.security import check_password_hash
 from app.forms import UploadForm
+from flask import current_app
+from flask import send_from_directory
 
 
 ###
@@ -45,7 +47,6 @@ def upload():
 
     return render_template('upload.html', form=form)
 
-
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     form = LoginForm()
@@ -68,6 +69,30 @@ def login():
             flash('Invalid username or password. Please try again.', 'danger')  # Flash error message
 
     return render_template('login.html', form=form)
+
+def get_uploaded_images():
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    file_list = []
+    
+    if not os.path.exists(upload_folder):
+        return file_list  # Return empty list if folder doesn't exist
+
+    for _, _, files in os.walk(upload_folder):
+        for file in files:
+            if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):  # Only image files
+                file_list.append(file)
+
+    return file_list
+
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/files')
+@login_required
+def files():
+    images = get_uploaded_images()
+    return render_template('files.html', images=images)
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
