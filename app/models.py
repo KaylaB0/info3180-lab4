@@ -12,14 +12,17 @@ class UserProfile(db.Model):
     first_name = db.Column(db.String(80))
     last_name = db.Column(db.String(80))
     username = db.Column(db.String(80), unique=True)
-    password = db.Column(db.String(128)) # Add password field 
+    password = db.Column(db.String(128)) # Add password field and store hashed password
 
     def __init__(self, first_name, last_name, username, password):
         self.first_name = first_name
         self.last_name = last_name
         self.username = username
-        self.password = generate_password_hash(password) # Hash password
+        self.password = generate_password_hash(password, method='pbkdf2:sha256') # Hash password before storing; Fixing error about hashed password exceeding 128
 
+    def verify_password(self, password):
+        return check_password_hash(self.password, password)
+    
     def is_authenticated(self):
         return True
 
