@@ -1,14 +1,32 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="container">
-    <h1 class="mt-4">Uploaded Images</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploaded Images</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <style>
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 columns */
+            gap: 15px; /* Same-sized gaps */
+            padding: 20px;
+        }
+        .image-grid img {
+            width: 350px;
+            height: 250px;
+            max-height: 250px; /* Limit the height */
+            object-fit: cover; /* Ensure the image is cropped to fit */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h2>Uploaded Images</h2>
     <div class="image-grid">
         {% for image in images %}
-            <div class="image-item">
-                <img src="{{ url_for('get_image', filename=image) }}" alt="Uploaded Image">
-            </div>
+            <img src="{{ url_for('get_image', filename=image) }}" alt="{{ image }}">
         {% endfor %}
     </div>
-</div>
-{% endblock %}
+</body>
+</html>

@@ -8,12 +8,13 @@ from app.forms import LoginForm
 from werkzeug.security import check_password_hash
 from app.forms import UploadForm
 from flask import current_app
-from flask import send_from_directory
+from flask import send_from_directory, Flask
 
 
 ###
 # Routing for your application.
 ###
+
 
 @app.route('/')
 def home():
@@ -41,7 +42,7 @@ def upload():
         # Secure the filename and save it to the upload folder
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))  # Ensure 'UPLOAD_FOLDER' is configured in the app
-
+        
         flash('File Saved', 'success')
         return redirect(url_for('home')) # Update this to redirect the user to a route that displays all uploaded image files
 
@@ -81,12 +82,14 @@ def get_uploaded_images():
         for file in files:
             if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):  # Only image files
                 file_list.append(file)
-
+                
     return file_list
 
 @app.route('/uploads/<filename>')
 def get_image(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    return send_from_directory(os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER']), filename)
+    
+
 
 @app.route('/files')
 @login_required
